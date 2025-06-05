@@ -183,7 +183,6 @@ const Home = () => {
         </div>
         <div className="mt-8 text-sm text-gray-500">
           <p>Test Credentials:</p>
-          <p>Admin: admin@ecommerce.com / admin123</p>
           <p>Customer: john.doe@example.com / password123</p>
         </div>
       </section>
