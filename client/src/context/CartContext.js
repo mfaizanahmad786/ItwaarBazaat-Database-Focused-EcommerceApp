@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import axios from 'axios';
+import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
+import axios from '../config/axios';
 import { useAuth } from './AuthContext';
 
 // Initial state

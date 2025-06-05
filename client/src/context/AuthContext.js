@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../config/axios';
 
 // Configure axios defaults
 // Remove hardcoded baseURL since we're using proxy
