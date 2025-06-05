@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import axios from '../config/axios';
 
 const Checkout = () => {
   const { cart, cartTotal, clearCart } = useCart();

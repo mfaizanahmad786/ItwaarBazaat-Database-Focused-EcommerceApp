@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../config/axios';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 

@@ -1,32 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../config/axios';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
     totalOrders: 0
   });
 
-  useEffect(() => {
-    fetchOrders();
-  }, [pagination.currentPage]);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async (page) => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/orders/my-orders?page=${pagination.currentPage}&limit=10`);
-      setOrders(response.data.orders);
-      setPagination(response.data.pagination);
+      setError(null);
+      const response = await axios.get(`/api/orders/my-orders?page=${page}&limit=10`);
+      setOrders(response.data.orders || []);
+      setPagination(response.data.pagination || { currentPage: 1, totalPages: 1, totalOrders: 0 });
     } catch (error) {
       console.error('Error fetching orders:', error);
+      setError('Failed to load orders. Please try again.');
+      setOrders([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchOrders(currentPage);
+  }, [currentPage, fetchOrders]);
 
   const handleCancelOrder = async (orderId) => {
     if (!window.confirm('Are you sure you want to cancel this order?')) {
@@ -36,7 +41,7 @@ const Orders = () => {
     try {
       await axios.patch(`/api/orders/${orderId}/cancel`);
       alert('Order cancelled successfully');
-      fetchOrders(); // Refresh orders
+      fetchOrders(currentPage); // Refresh current page
     } catch (error) {
       alert('Failed to cancel order: ' + (error.response?.data?.message || 'Unknown error'));
     }
@@ -67,6 +72,22 @@ const Orders = () => {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-20">
+        <div className="max-w-md mx-auto">
+          <div className="text-red-600 mb-4">{error}</div>
+          <button 
+            onClick={() => fetchOrders(currentPage)}
+            className="btn-primary"
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }
@@ -181,8 +202,8 @@ const Orders = () => {
       {pagination.totalPages > 1 && (
         <div className="flex justify-center space-x-2 mt-8">
           <button
-            onClick={() => setPagination({ ...pagination, currentPage: pagination.currentPage - 1 })}
-            disabled={pagination.currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
             className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300"
           >
             Previous
@@ -193,9 +214,9 @@ const Orders = () => {
             return (
               <button
                 key={page}
-                onClick={() => setPagination({ ...pagination, currentPage: page })}
+                onClick={() => setCurrentPage(page)}
                 className={`px-3 py-2 rounded-lg ${
-                  page === pagination.currentPage
+                  page === currentPage
                     ? 'bg-primary-600 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
@@ -206,8 +227,8 @@ const Orders = () => {
           })}
 
           <button
-            onClick={() => setPagination({ ...pagination, currentPage: pagination.currentPage + 1 })}
-            disabled={pagination.currentPage === pagination.totalPages}
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === pagination.totalPages}
             className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300"
           >
             Next
