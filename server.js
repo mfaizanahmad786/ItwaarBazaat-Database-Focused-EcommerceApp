@@ -26,7 +26,7 @@ app.use('/api/', limiter);
 // CORS Configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://yourdomain.com'] 
+    ? [process.env.CORS_ORIGIN || 'https://itwaar-bazaar-ecommerce-app.vercel.app'] 
     : ['http://localhost:3000'],
   credentials: true
 }));
